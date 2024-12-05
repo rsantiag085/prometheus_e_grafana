@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus-db:/prometheus
+    networks:
+      - homelab
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - homelab
+
+volumes:
+  prometheus-db:
+    driver: local
+
+networks:
+  homelab:
+    driver: bridge
